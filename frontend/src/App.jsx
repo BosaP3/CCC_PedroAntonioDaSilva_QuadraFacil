@@ -1,5 +1,4 @@
 import React from 'react';
-// Adicione a extensão .jsx no final do import
 import Login from './components/Login.jsx'; 
 import './components/Login.css';
 
