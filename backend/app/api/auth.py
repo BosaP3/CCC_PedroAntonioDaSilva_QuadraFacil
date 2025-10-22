@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 
-from backend.app.core.config import Settings
+from ..core.config import Settings
 
 from ..schemas.user import UserCreate, UserOut
 from ..models.user import User
