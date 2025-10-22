@@ -1,24 +1,23 @@
 import React, { useState } from 'react';
-import './Login.css'; // Importa nosso CSS
+import './Auth.css';
 
-function Login() {
+// Recebe a função toggleView como uma propriedade (prop)
+function Login({ toggleView }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
-    const [messageType, setMessageType] = useState('');
+    const [messageType, setMessageType] = useState(''); // 'success' or 'error'
 
     const handleSubmit = async (event) => {
-        event.preventDefault(); // Impede que a página recarregue
-
+        event.preventDefault();
         setMessage('');
         setMessageType('');
 
         const formData = new FormData();
-        formData.append('username', email); // backend -> 'username'
+        formData.append('username', email);
         formData.append('password', password);
 
         try {
-            // (fetch) para a API
             const response = await fetch("http://localhost:8000/auth/login", {
                 method: "POST",
                 body: formData,
@@ -33,8 +32,6 @@ function Login() {
             console.log("Token:", data.access_token);
             setMessage("Login realizado com sucesso!");
             setMessageType("success");
-            
-            // TODO: salvar o token
             // localStorage.setItem("accessToken", data.access_token);
 
         } catch (error) {
@@ -43,42 +40,46 @@ function Login() {
         }
     };
 
-    // HTML (JSX) componente
     return (
-        <div className="login-container">
+        <div className="auth-container">
             <form id="login-form" onSubmit={handleSubmit}>
                 <h2>Login Quadra Fácil</h2>
-                
+
                 <div className="input-group">
                     <label htmlFor="email">Email</label>
-                    <input 
-                        type="email" 
-                        id="email" 
+                    <input
+                        type="email"
+                        id="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        required 
+                        required
                     />
                 </div>
-                
+
                 <div className="input-group">
                     <label htmlFor="password">Senha</label>
-                    <input 
-                        type="password" 
-                        id="password" 
+                    <input
+                        type="password"
+                        id="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        required 
+                        required
                     />
                 </div>
-                
+
                 <button type="submit">Entrar</button>
-                
-                {/* mensagem de erro ou sucesso */}
                 {message && (
                     <p id="message" className={messageType}>
                         {message}
                     </p>
                 )}
+
+                <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+                    <button type="button" onClick={toggleView} className="toggle-button">
+                        Não tem uma conta? Registre-se
+                    </button>
+                </div>
+
             </form>
         </div>
     );
