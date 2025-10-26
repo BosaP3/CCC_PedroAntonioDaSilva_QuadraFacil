@@ -2,8 +2,13 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import IntegrityError, OperationalError
+from core.database import engine, Base
+import models.user
 
-from app.api import get_routers
+from api import get_routers
+
+# Cria as tabelas no banco
+Base.metadata.create_all(bind=engine)   
 
 app = FastAPI(
     title="Quadra Fácil API",

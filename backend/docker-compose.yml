@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./api_services
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api_services:/code
+    env_file:
+      - ./envs/.env.dev
+
+    command: python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - ./volumes/postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./envs/.env.dev
+    ports:
+      - "5432:5432"
+
