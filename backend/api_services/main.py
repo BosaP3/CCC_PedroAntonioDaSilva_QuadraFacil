@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import IntegrityError, OperationalError
 from core.database import engine, Base
 import models.user
+import models.quadras
 
 from api import get_routers
 
