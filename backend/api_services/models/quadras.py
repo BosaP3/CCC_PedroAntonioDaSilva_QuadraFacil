@@ -29,9 +29,12 @@ class Espaco(Base):
     criado_em = Column(DateTime(timezone=True), server_default=func.now())
     
     # Relacionamento de volta para o Usuario (Dono)
-    dono = relationship('Usuario', back_populates='espacos')
+    dono = relationship('Usuario', back_populates='espacos', lazy='selectin')
     # Relacionamento para os agendamentos feitos neste espaço
-    agendamentos = relationship('Agendamento', back_populates='espaco', cascade="all, delete-orphan")
+    agendamentos = relationship(
+        'Agendamento', back_populates='espaco', 
+        cascade="all, delete-orphan", lazy='selectin'
+    )
 
 class Agendamento(Base):
     __tablename__ = 'agendamentos'
@@ -44,11 +47,11 @@ class Agendamento(Base):
     criado_em = Column(DateTime(timezone=True), server_default=func.now())
     
     # Relacionamento de volta para o Espaco
-    espaco = relationship('Espaco', back_populates='agendamentos')
+    espaco = relationship('Espaco', back_populates='agendamentos', lazy='selectin')
     # Relacionamento de volta para o Usuario que agendou
-    usuario = relationship('Usuario', back_populates='agendamentos')
+    usuario = relationship('Usuario', back_populates='agendamentos', lazy='selectin')
     # Relacionamento para a partida (se houver)
-    partida = relationship('Partida', back_populates='agendamento', uselist=False, cascade="all, delete-orphan")
+    partida = relationship('Partida', back_populates='agendamento', uselist=False, cascade="all, delete-orphan", lazy='selectin')
 
 class Partida(Base):
     __tablename__ = 'partidas'
@@ -59,10 +62,10 @@ class Partida(Base):
     regras = Column(String(1000))
     
     # Relacionamento de volta para o Agendamento
-    agendamento = relationship('Agendamento', back_populates='partida')
+    agendamento = relationship('Agendamento', back_populates='partida', lazy='selectin')
     
     # Relacionamento para os participantes (usando o Objeto de Associação)
-    participantes = relationship('Participante', back_populates='partida', cascade="all, delete-orphan")
+    participantes = relationship('Participante', back_populates='partida', cascade="all, delete-orphan", lazy='selectin')
 
 class Participante(Base):
     """
@@ -77,6 +80,6 @@ class Participante(Base):
     papel = Column(SAEnum(PapelParticipante), nullable=False, default=PapelParticipante.jogador)
     
     # Relacionamentos para as "mães"
-    partida = relationship('Partida', back_populates='participantes')
-    usuario = relationship('Usuario', back_populates='partidas')
+    partida = relationship('Partida', back_populates='participantes', lazy='selectin')
+    usuario = relationship('Usuario', back_populates='partidas', lazy='selectin')
 

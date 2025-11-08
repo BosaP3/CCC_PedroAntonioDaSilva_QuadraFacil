@@ -61,6 +61,8 @@ def get_current_dono_user(current_user: CurrentUser) -> Usuario:
         )
     return current_user
 
+DonoUser = Annotated[Usuario, Depends(get_current_dono_user)]
+
 def get_current_admin_user(current_user: CurrentUser) -> Usuario:
     """
     Dependência de permissão:
@@ -72,3 +74,5 @@ def get_current_admin_user(current_user: CurrentUser) -> Usuario:
             detail="Acesso negado: Requer permissão de 'Admin'",
         )
     return current_user
+
+#AdminUser = Annotated[Usuario, Depends(get_current_admin_user)]

@@ -3,16 +3,14 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import selectinload # Para otimizar a consulta
 
-# Importações de blocos de construção
 from core.database import get_db
 from models.quadras import Espaco
-from models.user import Usuario # Precisamos do modelo Usuario
+from models.user import Usuario
 from schemas.quadras import EspacoCreate, EspacoOut
-# Importa as novas dependências de segurança
-from .deps import DBSession, get_current_dono_user, CurrentUser
+from .deps import DBSession, DonoUser, CurrentUser
 
-# Renomeia o tipo de dependência para clareza
-DonoUser = Annotated[Usuario, Depends(get_current_dono_user)]
+# Renomeia o tipo de dependência
+# DonoUser = Annotated[Usuario, Depends(get_current_dono_user)]
 
 # A Rota agora está segura e alinhada com o DVP
 router = APIRouter(prefix="/espacos", tags=["Espaços"])

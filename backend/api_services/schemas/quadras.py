@@ -23,7 +23,7 @@ class EspacoOut(EspacoBase):
     dono: UserOut
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class AgendamentoBase(BaseModel):
     id_espaco: int
@@ -42,7 +42,7 @@ class AgendamentoOut(AgendamentoBase):
     usuario: UserOut 
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ParticipanteOut(BaseModel):
     """
@@ -53,7 +53,7 @@ class ParticipanteOut(BaseModel):
     usuario: UserOut 
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class PartidaBase(BaseModel):
@@ -69,5 +69,5 @@ class PartidaOut(PartidaBase):
     participantes: List[ParticipanteOut] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
