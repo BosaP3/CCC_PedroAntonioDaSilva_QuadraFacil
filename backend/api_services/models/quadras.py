@@ -1,11 +1,10 @@
 import enum
 from sqlalchemy import (
-    Column, Integer, String, DateTime, Float, ForeignKey, 
-    Enum as SAEnum, Table
+    Column, Integer, String, DateTime, Enum as SAEnum, 
+    ForeignKey, Table, Float, CheckConstraint
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-
 from core.database import Base
 
 class StatusAgendamento(str, enum.Enum):
@@ -28,13 +27,8 @@ class Espaco(Base):
     valor_hora = Column(Float, nullable=False)
     criado_em = Column(DateTime(timezone=True), server_default=func.now())
     
-    # Relacionamento de volta para o Usuario (Dono)
     dono = relationship('Usuario', back_populates='espacos', lazy='selectin')
-    # Relacionamento para os agendamentos feitos neste espaço
-    agendamentos = relationship(
-        'Agendamento', back_populates='espaco', 
-        cascade="all, delete-orphan", lazy='selectin'
-    )
+    agendamentos = relationship('Agendamento', back_populates='espaco', cascade="all, delete-orphan", lazy='selectin')
 
 class Agendamento(Base):
     __tablename__ = 'agendamentos'
@@ -58,7 +52,9 @@ class Partida(Base):
     
     id_partida = Column(Integer, primary_key=True, index=True)
     id_agendamento = Column(Integer, ForeignKey('agendamentos.id_agendamento'), unique=True, nullable=False)
-    descricao = Column(String(500))
+    limite_jogadores = Column(Integer, CheckConstraint('limite_jogadores > 0'), nullable=False)
+    
+    descricao = Column(String(255))
     regras = Column(String(1000))
     
     # Relacionamento de volta para o Agendamento
@@ -68,11 +64,6 @@ class Partida(Base):
     participantes = relationship('Participante', back_populates='partida', cascade="all, delete-orphan", lazy='selectin')
 
 class Participante(Base):
-    """
-    Este é o "Association Object".
-    Ele substitui a 'participantes_partida' Table.
-    Ele "senta-se" entre Usuario e Partida e segura a coluna 'papel'.
-    """
     __tablename__ = 'participantes_partida'
     
     id_partida = Column(Integer, ForeignKey('partidas.id_partida'), primary_key=True)
@@ -82,4 +73,3 @@ class Participante(Base):
     # Relacionamentos para as "mães"
     partida = relationship('Partida', back_populates='participantes', lazy='selectin')
     usuario = relationship('Usuario', back_populates='partidas', lazy='selectin')
-

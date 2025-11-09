@@ -1,13 +1,12 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
-from typing import List
-
-from .user import UserOut
+from typing import List, Optional
 from models.quadras import StatusAgendamento, PapelParticipante
+from .user import UserOut 
 
 class EspacoBase(BaseModel):
     nome: str
-    endereco: str | None = None
+    endereco: Optional[str] = None
     valor_hora: float
 
 class EspacoCreate(EspacoBase):
@@ -19,11 +18,9 @@ class EspacoUpdate(EspacoBase):
 class EspacoOut(EspacoBase):
     id_espaco: int
     id_usuario: int
-    criado_em: datetime
     dono: UserOut
-
-    class Config:
-        from_attributes = True
+    
+    model_config= ConfigDict(from_attributes=True)
 
 class AgendamentoBase(BaseModel):
     id_espaco: int
@@ -35,39 +32,34 @@ class AgendamentoCreate(AgendamentoBase):
 class AgendamentoOut(AgendamentoBase):
     id_agendamento: int
     id_usuario: int
-    status: StatusAgendamento 
-    criado_em: datetime
+    status: StatusAgendamento
     
-    espaco: EspacoOut
+    espaco: EspacoOut 
     usuario: UserOut 
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class ParticipanteOut(BaseModel):
-    """
-    Descreve um participante em uma partida,
-    incluindo seu papel.
-    """
+    id_usuario: int
     papel: PapelParticipante
-    usuario: UserOut 
+    usuario: UserOut
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class PartidaBase(BaseModel):
-    descricao: str | None = None
-    regras: str | None = None
+    descricao: Optional[str] = None
+    regras: Optional[str] = None
+    limite_jogadores: int 
 
 class PartidaCreate(PartidaBase):
-    id_agendamento: int
+    pass 
 
 class PartidaOut(PartidaBase):
     id_partida: int
+    id_agendamento: int
+    
     agendamento: AgendamentoOut
     participantes: List[ParticipanteOut] = []
 
-    class Config:
-        from_attributes = True
-
+    model_config = ConfigDict(from_attributes=True)
