@@ -7,6 +7,7 @@ from models.user import Usuario
 from schemas.user import UserCreate, UserOut
 from core.security import get_password_hash
 from sqlalchemy.exc import IntegrityError
+from .deps import CurrentUser
 
 router = APIRouter(
     prefix="/users",
@@ -46,6 +47,14 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
             status_code=status.HTTP_409_CONFLICT,
             detail="Usuário com este e-mail já existe.",
         )
+
+@router.get("/me", response_model=UserOut)
+def read_users_me(current_user: CurrentUser):
+    """
+    Obtém os dados do usuário logado.
+    A dependência 'CurrentUser' (de 'api/deps.py')
+    """
+    return current_user
 
 @router.get("/{user_id}", response_model=UserOut)
 def read_user(user_id: int, db: Session = Depends(get_db)):
