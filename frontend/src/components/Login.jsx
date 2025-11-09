@@ -18,7 +18,7 @@ function Login({ toggleView }) {
         formData.append('password', password);
 
         try {
-            const response = await fetch("http://localhost:8000/auth/login", {
+            const response = await fetch("http://localhost:8000/token/", {
                 method: "POST",
                 body: formData,
             });
