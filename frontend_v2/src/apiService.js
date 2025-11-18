@@ -55,8 +55,16 @@ export const createEspaco = (espacoData) => api.post('/espacos/', espacoData);
 
 export const getAgendamentosDono = () => api.get('/agendamentos/espacos/meus');
 
-export const confirmarAgendamento = (idAgendamento) => 
-    api.patch(`/agendamentos/${idAgendamento}/confirmar`);
+export const confirmarAgendamento = (idAgendamento) => api.patch(`/agendamentos/${idAgendamento}/confirmar`);
 
-export const cancelarAgendamento = (idAgendamento) =>
-    api.patch(`/agendamentos/${idAgendamento}/cancelar`);
+export const cancelarAgendamento = (idAgendamento) => api.patch(`/agendamentos/${idAgendamento}/cancelar`);
+
+
+export const getAllEspacos = () => api.get('/espacos/');
+
+export const createAgendamento = (agendamentoData) => api.post('/agendamentos/', agendamentoData);
+
+export const getPartidasAbertas = () => api.get('/partidas/abertas');
+
+export const joinPartida = (idPartida) => api.post(`/partidas/${idPartida}/entrar`);
+

@@ -1,33 +1,33 @@
-// src/pages/DashboardCliente.jsx
-import React, { useState, useEffect } from 'react';
-import { getMeusAgendamentos } from '../apiService';
+import React, { useState } from 'react';
+import ClienteMeusAgendamentos from '../components/ClienteMeusAgendamentos';
+import ClienteBuscarEspacos from '../components/ClienteBuscarEspacos';
+import ClientePartidasAbertas from '../components/ClientePartidasAbertas';
+
+const VIEWS = {
+    BUSCAR_ESPACOS: 'BUSCAR_ESPACOS',
+    PARTIDAS_ABERTAS: 'PARTIDAS_ABERTAS',
+    MEUS_AGENDAMENTOS: 'MEUS_AGENDAMENTOS'
+};
 
 export default function DashboardCliente({ user }) {
-    const [agendamentos, setAgendamentos] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        const fetchAgendamentos = async () => {
-            try {
-                const data = await getMeusAgendamentos();
-                setAgendamentos(data);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchAgendamentos();
-    }, []);
+    const [view, setView] = useState(VIEWS.BUSCAR_ESPACOS); 
 
     const handleLogout = () => {
         localStorage.removeItem('quadraFacilToken');
         window.location.href = '/login';
     };
 
-    const formatData = (dataHora) => {
-        return new Date(dataHora).toLocaleString('pt-BR');
+    const renderView = () => {
+        switch (view) {
+            case VIEWS.BUSCAR_ESPACOS:
+                return <ClienteBuscarEspacos />;
+            case VIEWS.PARTIDAS_ABERTAS:
+                return <ClientePartidasAbertas />;
+            case VIEWS.MEUS_AGENDAMENTOS:
+                return <ClienteMeusAgendamentos />;
+            default:
+                return <ClienteBuscarEspacos />;
+        }
     };
 
     return (
@@ -36,24 +36,31 @@ export default function DashboardCliente({ user }) {
                 <h2>Olá, {user.nome}! (Cliente)</h2>
                 <button onClick={handleLogout} className="logout-btn">Sair</button>
             </div>
-            <p>Meus agendamentos (Módulo de Agendamento):</p>
-            
-            {loading && <p>Carregando agendamentos...</p>}
-            {error && <p className="mensagem-erro">{error}</p>}
 
-            <ul className="data-list">
-                {agendamentos.length > 0 ? (
-                    agendamentos.map(ag => (
-                        <li key={ag.id_agendamento} className="data-list-item">
-                            <strong>{ag.espaco.nome}</strong>
-                            <div>{formatData(ag.data_hora)}</div>
-                            <div>Status: <strong>{ag.status}</strong></div>
-                        </li>
-                    ))
-                ) : (
-                    !loading && <p>Você ainda não fez nenhum agendamento.</p>
-                )}
-            </ul>
+            <nav className="dashboard-nav">
+                <button 
+                    onClick={() => setView(VIEWS.BUSCAR_ESPACOS)}
+                    className={`nav-button ${view === VIEWS.BUSCAR_ESPACOS ? 'active' : ''}`}
+                >
+                    Reservar Espaço
+                </button>
+                <button 
+                    onClick={() => setView(VIEWS.PARTIDAS_ABERTAS)}
+                    className={`nav-button ${view === VIEWS.PARTIDAS_ABERTAS ? 'active' : ''}`}
+                >
+                    Partidas Abertas (Fecha Time)
+                </button>
+                <button 
+                    onClick={() => setView(VIEWS.MEUS_AGENDAMENTOS)}
+                    className={`nav-button ${view === VIEWS.MEUS_AGENDAMENTOS ? 'active' : ''}`}
+                >
+                    Meus Agendamentos
+                </button>
+            </nav>
+
+            <div className="dashboard-content">
+                {renderView()}
+            </div>
         </div>
     );
 }
