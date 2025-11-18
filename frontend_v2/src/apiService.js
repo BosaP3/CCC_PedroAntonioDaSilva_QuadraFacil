@@ -49,3 +49,14 @@ export const getMeusAgendamentos = () => api.get('/agendamentos/meus-agendamento
 
 
 export const getMeusEspacos = () => api.get('/espacos/meus-espacos');
+
+export const createEspaco = (espacoData) => api.post('/espacos/', espacoData);
+
+
+export const getAgendamentosDono = () => api.get('/agendamentos/espacos/meus');
+
+export const confirmarAgendamento = (idAgendamento) => 
+    api.patch(`/agendamentos/${idAgendamento}/confirmar`);
+
+export const cancelarAgendamento = (idAgendamento) =>
+    api.patch(`/agendamentos/${idAgendamento}/cancelar`);
