@@ -163,7 +163,6 @@ def leave_partida(
     Remove o usuário logado de uma partida.
     """
     
-    # 1. Encontrar o registro do participante
     participante = db.query(Participante).filter(
         Participante.id_partida == id_partida,
         Participante.id_usuario == current_user.id_usuario
@@ -175,14 +174,9 @@ def leave_partida(
             detail="Você não está nesta partida."
         )
     
-    # --- PONTO CEGO DE LÓGICA DE NEGÓCIO ---
-    # TODO: O que acontece se o 'organizador' sair?
-    # A partida deve ser cancelada? O papel deve ser transferido?
-    # Por enquanto, estamos permitindo que qualquer um saia.
     if participante.papel == PapelParticipante.organizador:
-        # Aqui você pode adicionar uma lógica futura
         pass 
 
     db.delete(participante)
     db.commit()
-    return None # Retorna 204 No Content
+    return None

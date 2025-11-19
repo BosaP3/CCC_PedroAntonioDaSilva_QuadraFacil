@@ -72,5 +72,71 @@ def get_espaco(espaco_id: int, db: DBSession):
         )
     return espaco
 
-# TODO: Adicionar rotas PUT e DELETE
-# lógica extra para verificar se o usuário é dono do espaço.
+@router.put("/{espaco_id}", response_model=EspacoOut)
+def update_espaco(
+    espaco_id: int,
+    espaco_in: EspacoCreate,
+    db: DBSession,
+    current_user: DonoUser
+):
+    """
+    Atualiza os dados de um espaço existente.
+    
+    Regra de Negócio:
+    - Apenas o DONO do espaço pode alterá-lo.
+    """
+    db_espaco = db.query(Espaco).filter(Espaco.id_espaco == espaco_id).first()
+
+    if not db_espaco:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Espaço não encontrado",
+        )
+
+
+    if db_espaco.id_usuario != current_user.id_usuario:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Você não tem permissão para editar este espaço."
+        )
+
+    update_data = espaco_in.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_espaco, key, value)
+
+    db.add(db_espaco)
+    db.commit()
+    db.refresh(db_espaco)
+    
+    return db_espaco
+
+@router.delete("/{espaco_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_espaco(
+    espaco_id: int,
+    db: DBSession,
+    current_user: DonoUser
+):
+    """
+    Remove um espaço do sistema.
+    
+    Regra de Negócio:
+    - Apenas o DONO do espaço pode deletá-lo.
+    """
+    db_espaco = db.query(Espaco).filter(Espaco.id_espaco == espaco_id).first()
+
+    if not db_espaco:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Espaço não encontrado",
+        )
+
+    if db_espaco.id_usuario != current_user.id_usuario:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Você não tem permissão para excluir este espaço."
+        )
+
+    db.delete(db_espaco)
+    db.commit()
+    
+    return db_espaco

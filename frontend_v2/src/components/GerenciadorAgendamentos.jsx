@@ -1,3 +1,4 @@
+// src/components/GerenciadorAgendamentos.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { getAgendamentosDono, confirmarAgendamento, cancelarAgendamento } from '../apiService';
 
@@ -8,10 +9,11 @@ export default function GerenciadorAgendamentos() {
 
     const formatData = (dataHora) => new Date(dataHora).toLocaleString('pt-BR');
 
+    // Função para buscar os agendamentos
     const fetchAgendamentos = useCallback(async () => {
         try {
             setLoading(true);
-            const data = await getAgendamentosDono(); //
+            const data = await getAgendamentosDono();
             setAgendamentos(data);
         } catch (err) {
             setError(err.message);
@@ -34,7 +36,7 @@ export default function GerenciadorAgendamentos() {
 
     const handleConfirmar = async (id) => {
         try {
-            const agendamentoAtualizado = await confirmarAgendamento(id); //
+            const agendamentoAtualizado = await confirmarAgendamento(id);
             updateLocalStatus(id, agendamentoAtualizado.status);
         } catch (err) {
             alert(`Erro ao confirmar: ${err.message}`);
@@ -42,8 +44,13 @@ export default function GerenciadorAgendamentos() {
     };
 
     const handleCancelar = async (id) => {
+        // Adicionamos uma confirmação simples para evitar cliques acidentais
+        if (!window.confirm("Tem certeza que deseja cancelar este agendamento?")) {
+            return;
+        }
+
         try {
-            const agendamentoAtualizado = await cancelarAgendamento(id); //
+            const agendamentoAtualizado = await cancelarAgendamento(id);
             updateLocalStatus(id, agendamentoAtualizado.status);
         } catch (err) {
             alert(`Erro ao cancelar: ${err.message}`);
@@ -64,24 +71,29 @@ export default function GerenciadorAgendamentos() {
                             <div>Data: {formatData(ag.data_hora)}</div>
                             <div>Status: <strong>{ag.status}</strong></div>
 
-                            {ag.status === 'pendente' && (
-                                <div className="action-buttons">
+                            {/* --- AQUI ESTÁ A MUDANÇA --- */}
+                            <div className="action-buttons">
+                                {/* Botão Confirmar: Apenas para PENDENTE */}
+                                {ag.status === 'pendente' && (
                                     <button 
                                         onClick={() => handleConfirmar(ag.id_agendamento)}
                                         className="btn-confirm"
                                     >
                                         Confirmar
                                     </button>
+                                )}
+
+                                {/* Botão Cancelar: Para PENDENTE ou CONFIRMADO */}
+                                {(ag.status === 'pendente' || ag.status === 'confirmado') && (
                                     <button 
                                         onClick={() => handleCancelar(ag.id_agendamento)}
                                         className="btn-cancel"
                                     >
-                                        Cancelar
+                                        Cancelar Agendamento
                                     </button>
-                                    
-                                </div>
-                                
-                            )}
+                                )}
+                            </div>
+                             {/* --- FIM DA MUDANÇA --- */}
                         </li>
                     ))
                 ) : (

@@ -68,3 +68,6 @@ export const getPartidasAbertas = () => api.get('/partidas/abertas');
 
 export const joinPartida = (idPartida) => api.post(`/partidas/${idPartida}/entrar`);
 
+export const updateEspaco = (idEspaco, espacoData) => api.put(`/espacos/${idEspaco}`, espacoData);   
+
+export const deleteEspaco = (idEspaco) => api.delete(`/espacos/${idEspaco}`);
