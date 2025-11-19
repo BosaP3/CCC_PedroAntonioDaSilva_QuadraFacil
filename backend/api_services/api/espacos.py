@@ -9,10 +9,6 @@ from models.user import Usuario
 from schemas.quadras import EspacoCreate, EspacoOut
 from .deps import DBSession, DonoUser, CurrentUser
 
-# Renomeia o tipo de dependência
-# DonoUser = Annotated[Usuario, Depends(get_current_dono_user)]
-
-# A Rota agora está segura e alinhada com o DVP
 router = APIRouter(prefix="/espacos", tags=["Espaços"])
 
 @router.post("/", response_model=EspacoOut, status_code=status.HTTP_201_CREATED)
