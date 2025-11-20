@@ -71,3 +71,11 @@ export const getPartidasAbertas = () => api.get('/partidas/abertas');
 export const joinPartida = (idPartida) => api.post(`/partidas/${idPartida}/entrar`);
 
 export const leavePartida = (idPartida) => api.delete(`/partidas/${idPartida}/sair`);
+
+export const getAgendamentosConfirmados = (idEspaco, dataInicioISO, dataFimISO) => {
+    const params = new URLSearchParams();
+    if (dataInicioISO) params.append('data_inicio', dataInicioISO);
+    if (dataFimISO) params.append('data_fim', dataFimISO);
+    
+    return api.get(`/agendamentos/espacos/${idEspaco}/confirmados?${params.toString()}`);
+};

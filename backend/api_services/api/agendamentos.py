@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import selectinload, joinedload 
 from datetime import datetime, timezone
+from typing import Optional
 
 from core.database import get_db
 from models.quadras import Espaco, Agendamento, StatusAgendamento
@@ -67,6 +68,40 @@ def create_agendamento(
 
     return db_agendamento
 
+@router.get("/espacos/{id_espaco}/confirmados", response_model=List[AgendamentoOut])
+def list_agendamentos_confirmados_por_espaco(
+    id_espaco: int,
+    db: DBSession,
+    data_inicio: Optional[datetime] = None,
+    data_fim: Optional[datetime] = None,
+):
+    """
+    Lista agendamentos CONFIRMADOS de um espaço específico.
+    Útil para montar o calendário de disponibilidade no frontend.
+    """
+    espaco = db.query(Espaco).filter(Espaco.id_espaco == id_espaco).first()
+    if not espaco:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Espaço não encontrado",
+        )
+
+    query = db.query(Agendamento).filter(
+        Agendamento.id_espaco == id_espaco,
+        Agendamento.status == StatusAgendamento.confirmado
+    )
+
+    if data_inicio:
+        query = query.filter(Agendamento.data_hora >= data_inicio)
+    else:
+        query = query.filter(Agendamento.data_hora >= datetime.now(timezone.utc))
+
+    if data_fim:
+        query = query.filter(Agendamento.data_hora <= data_fim)
+
+    agendamentos = query.order_by(Agendamento.data_hora.asc()).all()
+    
+    return agendamentos
 
 @router.get("/meus-agendamentos", response_model=List[AgendamentoOut])
 def list_meus_agendamentos(
