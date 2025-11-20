@@ -79,3 +79,5 @@ export const getAgendamentosConfirmados = (idEspaco, dataInicioISO, dataFimISO) 
     
     return api.get(`/agendamentos/espacos/${idEspaco}/confirmados?${params.toString()}`);
 };
+
+export const getMinhasPartidas = () => api.get('/partidas/minhas');

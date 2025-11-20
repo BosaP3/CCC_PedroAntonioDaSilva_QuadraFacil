@@ -76,6 +76,26 @@ def create_partida(
     db.refresh(db_partida)
     return db_partida
 
+@router.get("/minhas", response_model=List[PartidaOut])
+def list_minhas_partidas(
+    db: DBSession,
+    current_user: CurrentUser
+):
+    """
+    Lista todas as partidas em que o usuário logado é participante
+    (seja como Organizador ou Jogador).
+    """
+    partidas = (
+        db.query(Partida)
+        .join(Participante)
+        .filter(Participante.id_usuario == current_user.id_usuario)
+        .options(
+            selectinload(Partida.agendamento).selectinload(Agendamento.espaco),
+            selectinload(Partida.participantes).selectinload(Participante.usuario)
+        )
+        .all()
+    )
+    return partidas
 
 @router.get("/abertas", response_model=List[PartidaOut])
 def list_partidas_abertas(db: DBSession):

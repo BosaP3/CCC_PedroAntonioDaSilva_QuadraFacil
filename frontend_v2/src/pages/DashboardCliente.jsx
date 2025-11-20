@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import ClienteMeusAgendamentos from '../components/ClienteMeusAgendamentos';
 import ClienteBuscarEspacos from '../components/ClienteBuscarEspacos';
 import ClientePartidasAbertas from '../components/ClientePartidasAbertas';
+import ClienteMinhasPartidas from '../components/ClienteMinhasPartidas'; 
 
 const VIEWS = {
     BUSCAR_ESPACOS: 'BUSCAR_ESPACOS',
@@ -25,6 +26,8 @@ export default function DashboardCliente({ user }) {
                 return <ClientePartidasAbertas user={user} />;
             case VIEWS.MEUS_AGENDAMENTOS:
                 return <ClienteMeusAgendamentos />;
+            case VIEWS.MINHAS_PARTIDAS:
+                return <ClienteMinhasPartidas user={user} />;
             default:
                 return <ClienteBuscarEspacos />;
         }
@@ -55,6 +58,12 @@ export default function DashboardCliente({ user }) {
                     className={`nav-button ${view === VIEWS.MEUS_AGENDAMENTOS ? 'active' : ''}`}
                 >
                     Meus Agendamentos
+                </button>
+                <button 
+                    onClick={() => setView(VIEWS.MINHAS_PARTIDAS)}
+                    className={`nav-button ${view === VIEWS.MINHAS_PARTIDAS ? 'active' : ''}`}
+                >
+                    Meus Jogos
                 </button>
             </nav>
 
