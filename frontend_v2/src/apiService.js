@@ -44,14 +44,11 @@ export const api = {
 
 export const getMe = () => api.get('/users/me');
 
-
 export const getMeusAgendamentos = () => api.get('/agendamentos/meus-agendamentos');
-
 
 export const getMeusEspacos = () => api.get('/espacos/meus-espacos');
 
 export const createEspaco = (espacoData) => api.post('/espacos/', espacoData);
-
 
 export const getAgendamentosDono = () => api.get('/agendamentos/espacos/meus');
 
@@ -59,15 +56,18 @@ export const confirmarAgendamento = (idAgendamento) => api.patch(`/agendamentos/
 
 export const cancelarAgendamento = (idAgendamento) => api.patch(`/agendamentos/${idAgendamento}/cancelar`);
 
-
 export const getAllEspacos = () => api.get('/espacos/');
 
 export const createAgendamento = (agendamentoData) => api.post('/agendamentos/', agendamentoData);
+
+export const updateEspaco = (idEspaco, espacoData) => api.put(`/espacos/${idEspaco}`, espacoData);   
+
+export const deleteEspaco = (idEspaco) => api.delete(`/espacos/${idEspaco}`);
+
+export const createPartida = (idAgendamento, partidaData) => api.post(`/partidas/agendamento/${idAgendamento}`, partidaData);
 
 export const getPartidasAbertas = () => api.get('/partidas/abertas');
 
 export const joinPartida = (idPartida) => api.post(`/partidas/${idPartida}/entrar`);
 
-export const updateEspaco = (idEspaco, espacoData) => api.put(`/espacos/${idEspaco}`, espacoData);   
-
-export const deleteEspaco = (idEspaco) => api.delete(`/espacos/${idEspaco}`);
+export const leavePartida = (idPartida) => api.delete(`/partidas/${idPartida}/sair`);

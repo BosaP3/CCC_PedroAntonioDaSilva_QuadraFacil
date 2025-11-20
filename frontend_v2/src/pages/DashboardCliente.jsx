@@ -22,7 +22,7 @@ export default function DashboardCliente({ user }) {
             case VIEWS.BUSCAR_ESPACOS:
                 return <ClienteBuscarEspacos />;
             case VIEWS.PARTIDAS_ABERTAS:
-                return <ClientePartidasAbertas />;
+                return <ClientePartidasAbertas user={user} />;
             case VIEWS.MEUS_AGENDAMENTOS:
                 return <ClienteMeusAgendamentos />;
             default:

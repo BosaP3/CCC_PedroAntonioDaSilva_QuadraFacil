@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { getAllEspacos, createAgendamento } from '../apiService';
 
+const HORARIOS_DISPONIVEIS = [
+    "08:00", "09:00", "10:00", "11:00", 
+    "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00"
+];
+
 export default function ClienteBuscarEspacos() {
     const [espacos, setEspacos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const [espacoSelecionado, setEspacoSelecionado] = useState(null);
-    const [dataHora, setDataHora] = useState('');
+    
+    const [dataEscolhida, setDataEscolhida] = useState('');
+    const [horaEscolhida, setHoraEscolhida] = useState('');
 
     useEffect(() => {
         const fetchEspacos = async () => {
@@ -25,20 +32,29 @@ export default function ClienteBuscarEspacos() {
 
     const handleSelecionarEspaco = (espaco) => {
         setEspacoSelecionado(espaco);
-        setDataHora(''); 
-        window.scrollTo(0, 0); 
+        setDataEscolhida('');
+        setHoraEscolhida('');
+        window.scrollTo(0, 0);
     };
 
     const handleAgendar = async (e) => {
         e.preventDefault();
         setError(null);
+
+        if (!dataEscolhida || !horaEscolhida) {
+            alert("Por favor, escolha um dia e um horário.");
+            return;
+        }
         
-        const dataLocal = new Date(dataHora);
-        const dataEmUTC = dataLocal.toISOString();
+        const dataHoraLocalString = `${dataEscolhida}T${horaEscolhida}`;
+        const dataObj = new Date(dataHoraLocalString);
+        
+        const dataEmUTC = dataObj.toISOString(); 
+
         try {
             await createAgendamento({
                 id_espaco: espacoSelecionado.id_espaco,
-                data_hora: dataEmUTC
+                data_hora: dataEmUTC 
             });
             alert('Agendamento solicitado com sucesso! Aguarde a confirmação do dono.');
             setEspacoSelecionado(null); 
@@ -51,19 +67,42 @@ export default function ClienteBuscarEspacos() {
         return (
             <div className="form-container">
                 <h3>Reservar "{espacoSelecionado.nome}"</h3>
+                <p>Endereço: {espacoSelecionado.endereco || 'Não informado'}</p>
+                <p>Preço: R$ {espacoSelecionado.valor_hora.toFixed(2)} / hora</p>
+                
                 <form onSubmit={handleAgendar}>
-                    <p>Endereço: {espacoSelecionado.endereco || 'Não informado'}</p>
-                    <p>Preço: R$ {espacoSelecionado.valor_hora.toFixed(2)} / hora</p>
-                    <div>
-                        <label htmlFor="data_hora">Data e Hora</label>
+                    <div style={{ marginBottom: '1rem' }}>
+                        <label htmlFor="dia">Escolha o Dia:</label>
                         <input 
-                            type="datetime-local" 
-                            id="data_hora"
-                            value={dataHora}
-                            onChange={(e) => setDataHora(e.target.value)}
+                            type="date" 
+                            id="dia"
+                            value={dataEscolhida}
+                            onChange={(e) => setDataEscolhida(e.target.value)}
+                            min={new Date().toISOString().split('T')[0]}
                             required
+                            style={{ width: '100%', padding: '8px' }}
                         />
                     </div>
+
+                    <div style={{ marginBottom: '1rem' }}>
+                        <label htmlFor="hora">Horário Disponível:</label>
+                        <select
+                            id="hora"
+                            value={horaEscolhida}
+                            onChange={(e) => setHoraEscolhida(e.target.value)}
+                            required
+                            style={{ width: '100%', padding: '8px', backgroundColor: 'white' }}
+                        >
+                            <option value="" disabled>Selecione um horário...</option>
+                            {HORARIOS_DISPONIVEIS.map(horario => (
+                                <option key={horario} value={horario}>
+                                    {horario} até {parseInt(horario.split(':')[0]) + 1}:{horario.split(':')[1]}
+                                </option>
+                            ))}
+                        </select>
+                        <small style={{ color: '#666' }}>*Horários de 1 hora de duração</small>
+                    </div>
+
                     <button type="submit" className="btn-confirm">Solicitar Horário</button>
                     <button 
                         type="button" 
