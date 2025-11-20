@@ -101,7 +101,6 @@ export default function ClienteBuscarEspacos() {
         }
     };
 
-    // --- RENDERIZAÇÃO ---
     if (espacoSelecionado) {
         return (
             <div className="form-container">
@@ -117,7 +116,7 @@ export default function ClienteBuscarEspacos() {
                             value={dataEscolhida}
                             onChange={(e) => {
                                 setDataEscolhida(e.target.value);
-                                setHoraEscolhida(''); // Reseta a hora ao mudar o dia
+                                setHoraEscolhida('');
                             }}
                             min={new Date().toISOString().split('T')[0]}
                             required
@@ -135,7 +134,7 @@ export default function ClienteBuscarEspacos() {
                             value={horaEscolhida}
                             onChange={(e) => setHoraEscolhida(e.target.value)}
                             required
-                            disabled={!dataEscolhida || buscandoDisponibilidade} // Trava se não tiver data
+                            disabled={!dataEscolhida || buscandoDisponibilidade} 
                             style={{ width: '100%', padding: '8px', backgroundColor: 'white' }}
                         >
                             <option value="" disabled>
@@ -143,16 +142,15 @@ export default function ClienteBuscarEspacos() {
                             </option>
                             
                             {HORARIOS_DISPONIVEIS.map(horario => {
-                                // Verifica se este horário está na lista de ocupados
                                 const estaOcupado = horariosOcupados.includes(horario);
 
                                 return (
                                     <option 
                                         key={horario} 
                                         value={horario}
-                                        disabled={estaOcupado} // Impede a seleção
+                                        disabled={estaOcupado}
                                         style={{ 
-                                            color: estaOcupado ? 'red' : 'black', // Texto vermelho
+                                            color: estaOcupado ? 'red' : 'black',
                                             fontWeight: estaOcupado ? 'bold' : 'normal'
                                         }}
                                     >
@@ -178,26 +176,46 @@ export default function ClienteBuscarEspacos() {
 
     return (
         <div>
-            <h3>Encontre um Espaço</h3>
+            <header style={{ marginBottom: '2rem' }}>
+                <h2>Encontre a quadra perfeita</h2>
+                <p style={{ color: '#666' }}>Escolha entre as melhores quadras da região</p>
+            </header>
+
             {loading && <p>Carregando espaços...</p>}
             
-            <ul className="data-list">
+            <div className="cards-grid">
                 {espacos.map(espaco => (
-                    <li key={espaco.id_espaco} className="data-list-item">
-                        <strong>{espaco.nome}</strong>
-                        <div>Endereço: {espaco.endereco || 'Não informado'}</div>
-                        <div>Preço: R$ {espaco.valor_hora.toFixed(2)} / hora</div>
-                        <button 
-                            onClick={() => handleSelecionarEspaco(espaco)}
-                            className="btn-confirm"
-                            style={{ marginTop: '0.5rem' }}
-                        >
-                            Ver Disponibilidade
-                        </button>
-                    </li>
+                    <div key={espaco.id_espaco} className="card">
+                        <div className="card-header">
+                            🏟️
+                        </div>
+                        
+                        <div className="card-body">
+                            <h3 className="card-title">{espaco.nome}</h3>
+                            <div className="card-info">📍 {espaco.endereco || 'Endereço não inf.'}</div>
+                            <div className="card-info">👤 Dono: {espaco.dono.nome}</div>
+                            <div style={{ marginTop: 'auto', paddingTop: '1rem', fontWeight: 'bold', color: '#28a745' }}>
+                                R$ {espaco.valor_hora.toFixed(2)} <span style={{fontSize: '0.8rem', color: '#999'}}>/hora</span>
+                            </div>
+                        </div>
+
+                        <div className="card-footer">
+                            <button 
+                                onClick={() => handleSelecionarEspaco(espaco)}
+                                className="btn-primary"
+                            >
+                                Ver Disponibilidade
+                            </button>
+                        </div>
+                    </div>
                 ))}
-                {!loading && espacos.length === 0 && <p>Nenhum espaço cadastrado.</p>}
-            </ul>
+            </div>
+            
+            {!loading && espacos.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '3rem' }}>
+                    <p>Nenhum espaço encontrado. Volte mais tarde!</p>
+                </div>
+            )}
         </div>
     );
 }

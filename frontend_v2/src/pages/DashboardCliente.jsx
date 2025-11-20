@@ -1,75 +1,49 @@
 import React, { useState } from 'react';
+import Navbar from '../components/Navbar';
 import ClienteMeusAgendamentos from '../components/ClienteMeusAgendamentos';
 import ClienteBuscarEspacos from '../components/ClienteBuscarEspacos';
 import ClientePartidasAbertas from '../components/ClientePartidasAbertas';
-import ClienteMinhasPartidas from '../components/ClienteMinhasPartidas'; 
+import ClienteMinhasPartidas from '../components/ClienteMinhasPartidas';
 
 const VIEWS = {
     BUSCAR_ESPACOS: 'BUSCAR_ESPACOS',
     PARTIDAS_ABERTAS: 'PARTIDAS_ABERTAS',
-    MEUS_AGENDAMENTOS: 'MEUS_AGENDAMENTOS'
+    MEUS_AGENDAMENTOS: 'MEUS_AGENDAMENTOS',
+    MINHAS_PARTIDAS: 'MINHAS_PARTIDAS'
 };
 
 export default function DashboardCliente({ user }) {
     const [view, setView] = useState(VIEWS.BUSCAR_ESPACOS); 
 
-    const handleLogout = () => {
-        localStorage.removeItem('quadraFacilToken');
-        window.location.href = '/login';
-    };
+    const menuItems = [
+        { key: VIEWS.BUSCAR_ESPACOS, label: 'Reservar Quadra' },
+        { key: VIEWS.PARTIDAS_ABERTAS, label: 'Fecha Time' },
+        { key: VIEWS.MEUS_AGENDAMENTOS, label: 'Meus Agendamentos' },
+        { key: VIEWS.MINHAS_PARTIDAS, label: 'Meus Jogos' },
+    ];
 
     const renderView = () => {
         switch (view) {
-            case VIEWS.BUSCAR_ESPACOS:
-                return <ClienteBuscarEspacos />;
-            case VIEWS.PARTIDAS_ABERTAS:
-                return <ClientePartidasAbertas user={user} />;
-            case VIEWS.MEUS_AGENDAMENTOS:
-                return <ClienteMeusAgendamentos />;
-            case VIEWS.MINHAS_PARTIDAS:
-                return <ClienteMinhasPartidas user={user} />;
-            default:
-                return <ClienteBuscarEspacos />;
+            case VIEWS.BUSCAR_ESPACOS: return <ClienteBuscarEspacos />;
+            case VIEWS.PARTIDAS_ABERTAS: return <ClientePartidasAbertas user={user} />;
+            case VIEWS.MEUS_AGENDAMENTOS: return <ClienteMeusAgendamentos />;
+            case VIEWS.MINHAS_PARTIDAS: return <ClienteMinhasPartidas user={user} />;
+            default: return <ClienteBuscarEspacos />;
         }
     };
 
     return (
-        <div className="container">
-            <div className="dashboard-header">
-                <h2>Olá, {user.nome}! (Cliente)</h2>
-                <button onClick={handleLogout} className="logout-btn">Sair</button>
-            </div>
+        <div className="dashboard-layout">
+            <Navbar 
+                user={user} 
+                currentView={view} 
+                setView={setView} 
+                menuItems={menuItems} 
+            />
 
-            <nav className="dashboard-nav">
-                <button 
-                    onClick={() => setView(VIEWS.BUSCAR_ESPACOS)}
-                    className={`nav-button ${view === VIEWS.BUSCAR_ESPACOS ? 'active' : ''}`}
-                >
-                    Reservar Espaço
-                </button>
-                <button 
-                    onClick={() => setView(VIEWS.PARTIDAS_ABERTAS)}
-                    className={`nav-button ${view === VIEWS.PARTIDAS_ABERTAS ? 'active' : ''}`}
-                >
-                    Partidas Abertas (Fecha Time)
-                </button>
-                <button 
-                    onClick={() => setView(VIEWS.MEUS_AGENDAMENTOS)}
-                    className={`nav-button ${view === VIEWS.MEUS_AGENDAMENTOS ? 'active' : ''}`}
-                >
-                    Meus Agendamentos
-                </button>
-                <button 
-                    onClick={() => setView(VIEWS.MINHAS_PARTIDAS)}
-                    className={`nav-button ${view === VIEWS.MINHAS_PARTIDAS ? 'active' : ''}`}
-                >
-                    Meus Jogos
-                </button>
-            </nav>
-
-            <div className="dashboard-content">
+            <main className="main-content">
                 {renderView()}
-            </div>
+            </main>
         </div>
     );
 }
