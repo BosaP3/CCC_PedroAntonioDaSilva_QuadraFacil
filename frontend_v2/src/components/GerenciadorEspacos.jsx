@@ -1,4 +1,3 @@
-// src/components/GerenciadorEspacos.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { getMeusEspacos, deleteEspaco } from '../apiService';
 import EspacoForm from './EspacoForm';
@@ -8,9 +7,8 @@ export default function GerenciadorEspacos() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     
-    // Controles do formulário
     const [showForm, setShowForm] = useState(false);
-    const [espacoEditando, setEspacoEditando] = useState(null); // Guarda o objeto sendo editado
+    const [espacoEditando, setEspacoEditando] = useState(null);
 
     const fetchEspacos = useCallback(async () => {
         try {
@@ -24,32 +22,27 @@ export default function GerenciadorEspacos() {
         }
     }, []);
 
-    useEffect(() => {
-        fetchEspacos();
-    }, [fetchEspacos]);
+    useEffect(() => { fetchEspacos(); }, [fetchEspacos]);
 
-    // Ações
     const handleNovoEspaco = () => {
-        setEspacoEditando(null); // Garante que não tem nada selecionado
+        setEspacoEditando(null);
         setShowForm(true);
     };
 
     const handleEditar = (espaco) => {
-        setEspacoEditando(espaco); // Preenche o formulário com os dados deste espaço
+        setEspacoEditando(espaco);
         setShowForm(true);
-        // Rola para o topo para ver o form
         window.scrollTo(0, 0);
     };
 
     const handleExcluir = async (id) => {
-        if (!window.confirm('Tem certeza que deseja excluir este espaço?')) return;
-
+        if (!window.confirm('Tem a certeza que deseja excluir este espaço?')) return;
         try {
             await deleteEspaco(id);
-            alert('Espaço excluído com sucesso.');
-            fetchEspacos(); // Atualiza a lista
+            alert('Espaço excluído.');
+            fetchEspacos();
         } catch (err) {
-            alert(`Erro ao excluir: ${err.message}`);
+            alert(`Erro: ${err.message}`);
         }
     };
 
@@ -59,64 +52,74 @@ export default function GerenciadorEspacos() {
         fetchEspacos();
     };
 
-    const handleFormCancel = () => {
-        setShowForm(false);
-        setEspacoEditando(null);
-    };
-
     return (
         <div>
-            {loading && <p>Carregando espaços...</p>}
+            <header style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                    <h2>Meus Espaços</h2>
+                    <p style={{ color: '#666' }}>Faça a gestão das suas quadras e campos</p>
+                </div>
+                {!showForm && (
+                    <button onClick={handleNovoEspaco} className="btn-primary" style={{ width: 'auto', padding: '0.8rem 1.5rem' }}>
+                        + Novo Espaço
+                    </button>
+                )}
+            </header>
+
+            {loading && <p>Carregando...</p>}
             {error && <p className="mensagem-erro">{error}</p>}
 
-            {!showForm && (
-                <button onClick={handleNovoEspaco} className="nav-button">
-                    + Cadastrar Novo Espaço
-                </button>
-            )}
-
-            {/* Formulário (Aparece para Criar ou Editar) */}
             {showForm && (
-                <EspacoForm 
-                    onSuccess={handleFormSuccess} 
-                    onCancel={handleFormCancel}
-                    espacoParaEditar={espacoEditando} // Passamos o dado para o form
-                />
+                <div style={{ marginBottom: '2rem' }}>
+                    <EspacoForm 
+                        onSuccess={handleFormSuccess} 
+                        onCancel={() => setShowForm(false)}
+                        espacoParaEditar={espacoEditando}
+                    />
+                </div>
             )}
 
-            {/* Lista de Espaços */}
-            <ul className="data-list">
-                {espacos.length > 0 ? (
-                    espacos.map(espaco => (
-                        <li key={espaco.id_espaco} className="data-list-item">
-                            <div style={{ marginBottom: '0.5rem' }}>
-                                <strong>{espaco.nome}</strong>
-                                <div>Endereço: {espaco.endereco || 'Não informado'}</div>
-                                <div>Preço: R$ {espaco.valor_hora.toFixed(2)} / hora</div>
+            {!showForm && (
+                <div className="cards-grid">
+                    {espacos.map(espaco => (
+                        <div key={espaco.id_espaco} className="card">
+                            <div className="card-header" style={{ height: '100px', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', fontSize: '2.5rem' }}>
+                                🏟️
                             </div>
 
-                            {/* Botões de Ação */}
-                            <div className="action-buttons">
+                            <div className="card-body">
+                                <h3 className="card-title">{espaco.nome}</h3>
+                                <div className="card-info" style={{ margin: '10px 0' }}>
+                                    <p>📍 {espaco.endereco || 'Sem endereço'}</p>
+                                    <p style={{ fontWeight: 'bold', color: '#28a745', fontSize: '1.1rem' }}>
+                                        R$ {espaco.valor_hora.toFixed(2)}/h
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="card-footer">
                                 <button 
                                     onClick={() => handleEditar(espaco)}
-                                    className="btn-confirm"
-                                    style={{ backgroundColor: '#ffc107', color: '#000' }} // Amarelo para editar
+                                    className="btn-primary"
+                                    style={{ background: '#ffc107', color: '#000' }}
                                 >
                                     Editar
                                 </button>
                                 <button 
                                     onClick={() => handleExcluir(espaco.id_espaco)}
-                                    className="btn-cancel"
+                                    className="btn-danger"
                                 >
                                     Excluir
                                 </button>
                             </div>
-                        </li>
-                    ))
-                ) : (
-                    !loading && !showForm && <p>Você ainda não cadastrou nenhum espaço.</p>
-                )}
-            </ul>
+                        </div>
+                    ))}
+                </div>
+            )}
+            
+            {!loading && !showForm && espacos.length === 0 && (
+                <p style={{textAlign: 'center', marginTop: '3rem'}}>Ainda não tem espaços cadastrados.</p>
+            )}
         </div>
     );
 }
